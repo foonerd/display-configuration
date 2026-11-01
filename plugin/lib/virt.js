@@ -1,12 +1,12 @@
 'use strict';
-// Virtual guests: recognise the hypervisor and render the pieces of Andrew's
-// set-resolution.sh that the plugin owns. Three layers pin one resolution on a guest
-// with no usable EDID: Xorg (a Screen section with the one mode), GRUB (gfxpayload),
-// and the kernel line (video=). The last two ride rotation.cfg (grub.js); this module
-// renders the Xorg piece and classifies the host.
+// Virtual guests: recognise the hypervisor and render the Xorg piece of a fixed
+// resolution. Three layers pin one resolution on a guest with no usable EDID: Xorg
+// (a Screen section with the one mode), GRUB (gfxpayload), and the kernel line
+// (video=). The last two ride rotation.cfg (grub.js); this module renders the
+// Xorg piece and classifies the host.
 
-// Written by the root helper (xorg-conf write resolution); set-resolution.sh used
-// 10-resolution.conf, the plugin's file carries its name so uninstall can find it.
+// Written by the root helper (xorg-conf write resolution). The file carries the
+// plugin's name so uninstall can find it.
 const XORG_PATH = '/etc/X11/xorg.conf.d/90-display-configuration-resolution.conf';
 
 // systemd-detect-virt words and the DMI strings that name the same hypervisors.
