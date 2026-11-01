@@ -16,7 +16,7 @@
     "os": [
       "bookworm"
     ],
-    "details": "One place for everything the screen of an x86 player does: the turn and mirror of every connected output, the boot console and splash turned to match, the touch and pointer matrices that follow (with an offset for controllers mounted the other way), picture fit for screens that overscan, screensaver (DPMS or xscreensaver, held off while playing), cursor hiding and backlight brightness. Settings are named profiles with backup, restore and reset. On a virtual machine it fixes the resolution the guest boots with. Display changes apply at once; the boot console and splash take one reboot.",
+    "details": "One place for everything the screen of an x86 player does: the turn and mirror of every connected output, the boot console and splash turned to match, the touch and pointer matrices that follow (with an offset for controllers mounted the other way), picture fit for screens that overscan, screensaver (DPMS or xscreensaver, held off while playing), cursor hiding and backlight brightness. Settings are named profiles with backup, restore and reset. On a virtual machine it fixes the resolution the guest boots with. Display and console changes apply at once; the boot splash takes one reboot.",
     "changelog": "1.0.0 - Complete rework. Profiles with backup, restore and reset; every connected output, with mirror; touch and pointer follow the screen and persist across display restarts; picture fit and move for overscanning screens; virtual machine fixed resolution; settings apply and the page refreshes without a browser reload; root work through one installed helper, no password in the code."
   },
   "engines": {
