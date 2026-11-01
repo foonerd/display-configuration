@@ -1,7 +1,6 @@
 {
     "PLUGIN_TITLE": "Impostazioni schermo",
     "APPLY": "Applica",
-
     "DISPLAY_SETTINGS_SECTION": "Impostazioni schermo",
     "SCREEN_ROT": "Rotazione schermo",
     "SCREEN_ROT_DOC": "Imposta l'orientamento per il display e tutti i livelli di input/output.",
@@ -9,10 +8,8 @@
     "LEFT": "Sinistra (90 CCW)",
     "RIGHT": "Destra (90 CW)",
     "INVERTED": "Invertito (180)",
-
     "BRIGHTNESS": "Luminosita",
     "BRIGHTNESS_DOC": "Regola il livello di luminosita dello schermo.",
-
     "ADVANCED_SETTINGS_SECTION": "Impostazioni avanzate",
     "SHOW_ADVANCED": "Mostra impostazioni avanzate",
     "SHOW_ADVANCED_DOC": "Regolazione fine della rotazione per touch, mouse, console e schermate di avvio.",
@@ -43,7 +40,6 @@
     "NO_SS_IF_PLAY": "Disabilita durante la riproduzione",
     "NO_SS_IF_PLAY_DOC": "Disabilita il salvaschermo durante la riproduzione.",
     "XSCREEN_SAVER_SETTING": "Impostazioni Xscreensaver",
-
     "DEBUG_SECTION": "Diagnostica",
     "DEBUG_LOGGING": "Registrazione debug",
     "DEBUG_LOGGING_DOC": "Abilita la registrazione dettagliata per la risoluzione dei problemi. Disabilitare per l'uso in produzione.",

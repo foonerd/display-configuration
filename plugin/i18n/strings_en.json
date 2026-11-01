@@ -1,7 +1,6 @@
 {
     "PLUGIN_TITLE": "Display Settings",
     "APPLY": "Apply",
-
     "DISPLAY_SETTINGS_SECTION": "Display Settings",
     "SCREEN_ROT": "Screen Rotation",
     "SCREEN_ROT_DOC": "Sets orientation for display and all input/output layers.",
@@ -9,10 +8,8 @@
     "LEFT": "Left (90 CCW)",
     "RIGHT": "Right (90 CW)",
     "INVERTED": "Inverted (180)",
-
     "BRIGHTNESS": "Brightness",
     "BRIGHTNESS_DOC": "Adjust screen brightness level.",
-
     "ADVANCED_SETTINGS_SECTION": "Advanced Settings",
     "SHOW_ADVANCED": "Show Advanced Settings",
     "SHOW_ADVANCED_DOC": "Fine-tune rotation for touch, mouse, console, and boot screens.",
@@ -43,7 +40,6 @@
     "NO_SS_IF_PLAY": "Disable When Playing",
     "NO_SS_IF_PLAY_DOC": "Disable screensaver during playback.",
     "XSCREEN_SAVER_SETTING": "Xscreensaver Settings",
-
     "DEBUG_SECTION": "Diagnostics",
     "DEBUG_LOGGING": "Debug Logging",
     "DEBUG_LOGGING_DOC": "Enable detailed logging for troubleshooting. Disable for production use.",

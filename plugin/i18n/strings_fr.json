@@ -1,7 +1,6 @@
 {
     "PLUGIN_TITLE": "Parametres d'affichage",
     "APPLY": "Appliquer",
-
     "DISPLAY_SETTINGS_SECTION": "Parametres d'affichage",
     "SCREEN_ROT": "Rotation de l'ecran",
     "SCREEN_ROT_DOC": "Definit l'orientation de l'ecran et de toutes les couches d'entree/sortie.",
@@ -9,10 +8,8 @@
     "LEFT": "Gauche (90 CCW)",
     "RIGHT": "Droite (90 CW)",
     "INVERTED": "Inverse (180)",
-
     "BRIGHTNESS": "Luminosite",
     "BRIGHTNESS_DOC": "Ajuster le niveau de luminosite de l'ecran.",
-
     "ADVANCED_SETTINGS_SECTION": "Parametres avances",
     "SHOW_ADVANCED": "Afficher les parametres avances",
     "SHOW_ADVANCED_DOC": "Reglage fin de la rotation pour le tactile, la souris, la console et les ecrans de demarrage.",
@@ -43,7 +40,6 @@
     "NO_SS_IF_PLAY": "Desactiver pendant la lecture",
     "NO_SS_IF_PLAY_DOC": "Desactiver l'economiseur pendant la lecture.",
     "XSCREEN_SAVER_SETTING": "Parametres Xscreensaver",
-
     "DEBUG_SECTION": "Diagnostics",
     "DEBUG_LOGGING": "Journalisation de debogage",
     "DEBUG_LOGGING_DOC": "Active la journalisation detaillee pour le depannage. Desactiver pour la production.",
