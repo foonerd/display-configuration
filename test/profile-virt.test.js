@@ -196,7 +196,7 @@ test('virt: classification from systemd-detect-virt first, DMI second', () => {
     assert.equal(V.classify({ sysVendor: 'Dell Inc.' }).virtual, false);
 });
 
-captured('virt: the xorg file equals what set-resolution.sh writes', () => {
+captured('virt: the xorg file is the Monitor and Screen pair that pins one mode', () => {
     const want = fixture('10-resolution.1280x720.conf');
     assert.equal(V.xorgConf('1280x720'), want);
     assert.throws(() => V.xorgConf('1280'), RangeError);
