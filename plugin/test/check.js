@@ -14,8 +14,10 @@ const json = (f) => JSON.parse(read(f));
 let failures = 0;
 const fail = (msg) => { failures += 1; console.error('FAIL ' + msg); };
 
-try { execFileSync(process.execPath, ['--check', path.join(root, 'index.js')], { stdio: 'pipe' }); }
-catch (e) { fail('index.js: ' + e.stderr.toString().trim()); }
+for (const f of ['index.js', ...fs.readdirSync(path.join(root, 'lib')).filter((n) => n.endsWith('.js')).map((n) => 'lib/' + n)]) {
+    try { execFileSync(process.execPath, ['--check', path.join(root, f)], { stdio: 'pipe' }); }
+    catch (e) { fail(f + ': ' + e.stderr.toString().trim()); }
+}
 
 const languages = fs.readdirSync(path.join(root, 'i18n')).filter((f) => /^strings_[a-z]{2}\.json$/.test(f));
 for (const f of ['package.json', 'config.json', 'UIConfig.json', ...languages.map((l) => 'i18n/' + l)]) {

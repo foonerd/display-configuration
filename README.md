@@ -46,12 +46,12 @@ After updating, restart Volumio (or reboot) so the new version is the one runnin
 
 | Path | Holds |
 | --- | --- |
-| `plugin/` | The plugin as the store receives it: `index.js`, `package.json`, `config.json`, `UIConfig.json`, `i18n/`, `install.sh`, `uninstall.sh`, and its static check under `test/`. |
+| `plugin/` | The plugin as the store receives it: `index.js`, `package.json`, `config.json`, `UIConfig.json`, `i18n/`, `install.sh`, `uninstall.sh`, the device-independent modules under `lib/`, and the tests under `test/` (not shipped). |
 | `scripts/package.sh` | Assembles the plugin zip, `dist/display_configuration-<version>.zip`, with the node modules. |
 | `scripts/release-notes.sh` | Prints one version's changelog section, for the release notes. |
 | `.github/workflows/` | CI on every push (the check, the shell lint, the zip); the release on a tag `vX.Y.Z` (the zip and its digest, published as a pre-release). |
 
-The check runs with `npm test --prefix plugin`: the code parses, every file is valid JSON ending in a newline, every UI label has a translation, every language carries every key, every button names a field and a method that exist, and the install scripts end as the store requires.
+The tests run with `npm test --prefix plugin`: the unit tests of the modules under `plugin/lib/` against captured `xrandr` and `xinput` output, and the static check (the code parses, every file is valid JSON ending in a newline, every UI label has a translation, every language carries every key, every button names a field and a method that exist, and the install scripts end as the store requires).
 
 ## Licence
 

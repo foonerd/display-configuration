@@ -4,7 +4,8 @@
   "description": "Configure the local display, touchscreen, screensaver...",
   "main": "index.js",
   "scripts": {
-    "test": "node test/check.js"
+    "test": "node --test test/",
+    "check": "node test/check.js"
   },
   "author": "Balbuze, Just a Nerd",
   "license": "ISC",

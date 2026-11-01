@@ -4,6 +4,11 @@ All notable changes to Display Configuration are recorded here. The format follo
 
 ## [Unreleased]
 
+- The orientation model: the eight ways a rectangle can face (four turns, with or without a mirror), with conversions to every layer's own notation (xrandr rotate and reflect, fbcon, Plymouth, the kernel's panel orientation and `video=` options, the input transformation matrix), tested against the tables the shipped plugin used and against the kernel's conventions.
+- Parsers for `xrandr --verbose`, `xrandr --listproviders`, `xinput list` and `xinput list-props`, and builders for the xrandr and xinput commands and the boot file GRUB reads, each validated before anything is rendered.
+- Named profiles with a single schema, a migration from the 0.0.43 settings, and a planner that turns a profile and the probed screens and inputs into the actions for X, the inputs, the boot files and the session.
+- Virtual guests: recognition of the hypervisor and the fixed-resolution Xorg file.
+
 ## [0.0.43] - 2026-06-23
 
 The plugin as the Volumio store ships it, the starting point of this repository.
