@@ -6,9 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Balbuze,Nerd",
+  "author": "Balbuze, Just a Nerd",
   "license": "ISC",
-  "repository": "https://github.com/balbuze/volumio4-x86-kiosk-settings",
+  "repository": "https://github.com/foonerd/display-configuration",
   "volumio_info": {
     "prettyName": "Display configuration",
     "plugin_type": "user_interface",
