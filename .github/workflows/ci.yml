@@ -1,0 +1,34 @@
+# The check on every push and pull request, and the plugin zip as a build artefact.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: static check, shell lint, plugin zip
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+      - run: npm test --prefix plugin
+      - run: shellcheck -S warning plugin/install.sh plugin/uninstall.sh scripts/*.sh
+      - run: scripts/package.sh
+      - name: The zip names the commit it was built from and carries the modules
+        run: |
+          unzip -p dist/display_configuration-*.zip build.json | grep -F "\"commit\": \"$(git rev-parse --short HEAD)\""
+          for module in fs-extra kew v-conf socket.io-client; do
+            unzip -l dist/display_configuration-*.zip | grep -q " node_modules/$module/package.json\$" || { echo "no module $module in the zip" >&2; exit 1; }
+          done
+      - uses: actions/upload-artifact@v7
+        with:
+          name: plugin
+          path: dist/*.zip
+          if-no-files-found: error
