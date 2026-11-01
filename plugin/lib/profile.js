@@ -112,10 +112,15 @@ function validate(cfg) {
 
 // ---- migration from the 0.0.43 config.json (v-conf shape: { key: { value, ... } }) ----
 
+// v-conf stores a select either as { value: "right" } (the shipped defaults) or, after
+// a save by the 0.0.x plugin, as { value: { value: "right", label: "Right (90 CW)" } }.
 function valueOf(old, key, fallback) {
     const e = old && old[key];
     if (!e || e.value === undefined || e.value === null) return fallback;
-    return e.value;
+    let v = e.value;
+    if (typeof v === 'object' && v !== null && 'value' in v) v = v.value;
+    if (v === undefined || v === null || v === '') return fallback;
+    return v;
 }
 
 function migrateFrom043(old) {
@@ -236,13 +241,19 @@ function plan(cfg, probe) {
     if (!fb.exact || !ply.exact) notes.push('the console and the splash cannot mirror; the turn is applied without the mirror');
     const distinct = new Set(perOutput.map((x) => x.forKernel.turn));
     if (distinct.size > 1) notes.push('outputs ask for different turns; the console can follow only the first');
+    // The kernel line carries a connector only when there is a mode to name (a chosen
+    // mode, or a virtual guest's fixed resolution). A rotation alone adds nothing here:
+    // for 90 and 270 the DRM client can only hint fbcon, and fbcon=rotate: already
+    // sets that and wins when both are given (fbcon.c, initial_rotation). The GOLE 2
+    // Pro runs upright on exactly fbcon=rotate:1 plus plymouth=90 and bare video=efifb.
     const primaryOut = primary ? connected.find((o) => o.name === primary.output) : null;
     const wantPrimary = primaryOut ? (p.outputs[primaryOut.name] || p.outputs[ANY]) : null;
+    const modeForKernel = wantPrimary ? (p.virtual.enabled ? p.virtual.resolution : wantPrimary.mode) : null;
     steps.push({
         layer: 'boot', action: 'rotation.cfg',
         plymouth: ply.degrees, fbcon: fb.value,
-        video: primaryOut && (wantPrimary.mode || p.virtual.enabled || bootBase.turn !== 'normal')
-            ? { connector: primaryOut.name !== 'default' ? primaryOut.name : null, mode: p.virtual.enabled ? p.virtual.resolution : wantPrimary.mode, rotate: O.toCmdline(bootBase).rotate }
+        video: primaryOut && modeForKernel
+            ? { connector: primaryOut.name !== 'default' ? primaryOut.name : null, mode: modeForKernel, rotate: O.toCmdline(bootBase).rotate }
             : null,
         gfxpayload: p.virtual.enabled ? 'keep' : null,
     });

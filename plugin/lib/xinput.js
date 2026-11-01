@@ -21,7 +21,8 @@ function parseList(text) {
     return devices;
 }
 
-// Property lines: "\tName (id):\tvalue" with values comma-separated.
+// Property lines: "\tName (id):\tvalue" with values comma-separated. One device per
+// call; a second "Device '...':" header ends the read.
 const PROP_LINE = /^\s*(.+?) \((\d+)\):\s*(.*)$/;
 
 function parseProps(text) {
@@ -29,7 +30,7 @@ function parseProps(text) {
     let device = null;
     for (const raw of String(text).split('\n')) {
         const d = /^Device '(.*)':$/.exec(raw.trim());
-        if (d) { device = d[1]; continue; }
+        if (d) { if (device !== null) break; device = d[1]; continue; }
         const m = PROP_LINE.exec(raw);
         if (!m) continue;
         props[m[1]] = { id: +m[2], value: m[3].trim() };
