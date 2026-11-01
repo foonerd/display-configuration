@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Volumio community
+    url: https://community.volumio.com/
+    about: For questions and discussion; test reports are welcome there too, with the same diagnostics report.

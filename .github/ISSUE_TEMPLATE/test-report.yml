@@ -1,0 +1,68 @@
+name: Test report
+description: What you tried on your screen and what happened, good or bad. One report per device.
+title: "[device]: "
+labels: ["test report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for trying Display Configuration. Everything below is read; the diagnostics report at the end is what makes a report actionable.
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      description: Make and model, and how the screen is connected (built-in panel, HDMI, DP, USB, a virtual machine and which).
+      placeholder: GOLE 2 Pro, built-in DSI panel with touch
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version and Volumio version
+      placeholder: 1.0.0 on Volumio 4.221
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How it was installed
+      options:
+        - Fresh install of 1.0.0
+        - Upgrade from the store's 0.0.4x (settings carried over)
+        - Other (say below)
+    validations:
+      required: true
+  - type: textarea
+    id: tried
+    attributes:
+      label: What you set
+      description: The turn, the touch offset, the boot section, the screensaver, the fit, the profile; whatever you changed.
+      placeholder: Screen turn Right, touch offset Upside down, console and splash Same as the screen.
+    validations:
+      required: true
+  - type: textarea
+    id: saw
+    attributes:
+      label: What happened
+      description: What the screen, the touch, the console and the splash did, step by step. A photo helps when the picture or the touch is wrong.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+      description: Leave empty if everything worked and this is a success report.
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics report
+      description: "Maintenance → Write a diagnostics report, then over SSH: `cat /tmp/volumio-display-diagnostics.txt`. Paste it whole. It holds the settings, what the plugin sees (xrandr, xinput, DMI, kernel line), what it did, and the relevant Xorg log lines; no account or network data."
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: kiosk
+    attributes:
+      label: Kiosk log, if the display misbehaved
+      description: "`tail -n 60 /var/log/volumiokiosk.log` and `sudo journalctl -u volumio-kiosk -n 60 --no-pager`."
+      render: text
