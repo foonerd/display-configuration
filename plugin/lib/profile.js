@@ -219,12 +219,13 @@ function plan(cfg, probe) {
     for (const dev of probe.inputs || []) {
         if (dev.kind !== 'absolute' && dev.kind !== 'relative' && dev.kind !== 'pointer') continue;
         const specific = p.inputs[dev.name];
-        const generic = dev.kind === 'relative' ? (p.inputs['relative:*'] || null) : p.inputs[ANY];
+        const generic = dev.kind === 'relative' ? (p.inputs['relative:*'] || null) : (dev.kind === 'pointer' ? null : p.inputs[ANY]);
         const want = specific || generic;
-        if (!want) continue;
-        if (dev.kind === 'relative' && !specific && !p.inputs['relative:*']) continue; // xrandr turns relative pointers itself
+        if (!want) continue; // relative pointers already move in screen space; an unclassified one is turned only by name
         const target = (want.output && perOutput.find((x) => x.output === want.output)) || primary;
-        const base = target ? target.forX : O.NORMAL;
+        // A relative device's motion is in screen coordinates (the server rotates the
+        // framebuffer, not the motion), so only the user's own offset applies to it.
+        const base = dev.kind === 'relative' ? O.NORMAL : (target ? target.forX : O.NORMAL);
         const m = O.compose(base, O.parse(want.offset));
         steps.push({ layer: 'input', device: dev.id, name: dev.name, action: 'matrix', matrix: O.toInputMatrix(m) });
         if (target && connected.length > 1 && dev.kind === 'absolute') steps.push({ layer: 'input', device: dev.id, name: dev.name, action: 'map-to-output', output: target.output });

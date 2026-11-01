@@ -3,14 +3,16 @@
 // xrandr commands the plugin issues. Parsing is pure; nothing here runs a process.
 //
 // Shape of --verbose (xrandr 1.5.x): a "Screen N:" line; per output a header line
-//   <name> connected|disconnected [primary] [WxH+X+Y] [(0xid)] <rotation> (<reflect>)
+//   <name> connected|disconnected [primary] [WxH+X+Y] [(0xid)] <rotation> [<reflection>] (<supported>)
 //   [<mm>mm x <mm>mm] [panning ...]
+// where <reflection> is "X axis", "Y axis" or "X and Y axis" and appears only when set;
 // then tab-indented "key: value" lines (Identifier, CRTC, Transform with two
 // continuation lines, then driver properties with a "\t\tsupported:" or "\t\trange:"
 // line), then two-space-indented mode lines "  WxH (0xid) MHz [+preferred] [*current]"
 // each followed by "h:" and "v:" timing lines.
 
-const HEADER = /^(\S+) (connected|disconnected|unknown connection)( primary)?(?: (\d+)x(\d+)\+(\d+)\+(\d+))?(?: \((0x[0-9a-f]+)\))?(?: (normal|left|inverted|right) \(([^)]*)\))?(?: (\d+)mm x (\d+)mm)?(.*)$/;
+const HEADER = /^(\S+) (connected|disconnected|unknown connection)( primary)?(?: (\d+)x(\d+)\+(\d+)\+(\d+))?(?: \((0x[0-9a-f]+)\))?(?: (normal|left|inverted|right)(?: (X axis|Y axis|X and Y axis))? \(([^)]*)\))?(?: (\d+)mm x (\d+)mm)?(.*)$/;
+const REFLECTION = { 'X axis': 'x', 'Y axis': 'y', 'X and Y axis': 'xy' };
 const MODE = /^  (\d+)x(\d+)(i)? \((0x[0-9a-f]+)\)\s+([\d.]+)MHz(.*)$/;
 const H_TIMING = /^\s+h: width\s+(\d+) start\s+(\d+) end\s+(\d+) total\s+(\d+) skew\s+(\d+) clock\s+([\d.]+)KHz/;
 const V_TIMING = /^\s+v: height\s+(\d+) start\s+(\d+) end\s+(\d+) total\s+(\d+)\s+clock\s+([\d.]+)Hz/;
@@ -44,8 +46,8 @@ function parseVerbose(text) {
                 geometry: m[4] !== undefined ? { width: +m[4], height: +m[5], x: +m[6], y: +m[7] } : null,
                 modeId: m[8] || null,
                 rotation: m[9] || null,
-                reflection: m[10] !== undefined ? (m[10].trim() || 'normal') : null,
-                physical: m[11] !== undefined ? { widthMm: +m[11], heightMm: +m[12] } : null,
+                reflection: m[9] ? (REFLECTION[m[10]] || 'normal') : null,
+                physical: m[12] !== undefined ? { widthMm: +m[12], heightMm: +m[13] } : null,
                 rotationsSupported: [],
                 reflectionsSupported: [],
                 properties: {},

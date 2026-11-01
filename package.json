@@ -1,0 +1,12 @@
+{
+  "name": "display-configuration-repository",
+  "private": true,
+  "description": "Tests and tooling for the Display Configuration plugin; the plugin itself is plugin/",
+  "scripts": {
+    "pretest": "npm install --prefix plugin --omit=dev --no-audit --no-fund --loglevel=error",
+    "test": "node --test test/*.test.js test/check.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,15 +1,14 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('fs');
-const path = require('path');
-const I = require('../lib/xinput');
-const G = require('../lib/grub');
-const O = require('../lib/orientation');
+const I = require('../plugin/lib/xinput');
+const G = require('../plugin/lib/grub');
+const O = require('../plugin/lib/orientation');
+const { fixture, skip } = require('./fixtures');
 
-const fixture = (f) => fs.readFileSync(path.join(__dirname, 'fixtures', f), 'utf8');
+const captured = (name, fn) => test(name, { skip }, fn);
 
-test('xinput list from VirtualBox: eleven devices, roles and kinds read through the box-drawing glyphs', () => {
+captured('xinput list from VirtualBox: eleven devices, roles and kinds read through the box-drawing glyphs', () => {
     const d = I.parseList(fixture('xinput-list.virtualbox.txt'));
     assert.equal(d.length, 11);
     const tablet = d.find((x) => x.name === 'VirtualBox USB Tablet');
@@ -20,7 +19,7 @@ test('xinput list from VirtualBox: eleven devices, roles and kinds read through 
     assert.deepEqual(I.pointerSlaves(d).map((x) => x.id), [9, 10, 12]);
 });
 
-test('xinput list-props: the matrix and libinput properties are read', () => {
+captured('xinput list-props: the matrix and libinput properties are read', () => {
     const { device, props } = I.parseProps(fixture('xinput-props.vbox-tablet.txt'));
     assert.equal(device, 'VirtualBox USB Tablet');
     assert.equal(props['Device Enabled'].value, '1');
@@ -29,7 +28,7 @@ test('xinput list-props: the matrix and libinput properties are read', () => {
     assert.equal(I.nodeOf(props), '/dev/input/event6');
 });
 
-test('classification: absolute by libinput calibration property, relative by accel speed, names as fallback', () => {
+captured('classification: absolute by libinput calibration property, relative by accel speed, names as fallback', () => {
     const list = I.parseList(fixture('xinput-list.virtualbox.txt'));
     const tablet = list.find((x) => x.id === 10);
     const { props } = I.parseProps(fixture('xinput-props.vbox-tablet.txt'));

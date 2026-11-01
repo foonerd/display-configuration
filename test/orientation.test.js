@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const O = require('../lib/orientation');
+const O = require('../plugin/lib/orientation');
 
 test('eight distinct orientations, closed under composition', () => {
     const all = O.all();

@@ -1,15 +1,14 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('fs');
-const path = require('path');
-const X = require('../lib/xrandr');
+const X = require('../plugin/lib/xrandr');
+const { fixture, skip } = require('./fixtures');
 
-const fixture = (f) => fs.readFileSync(path.join(__dirname, 'fixtures', f), 'utf8');
+const captured = (name, fn) => test(name, { skip }, fn);
 
 // Captured on virtbookworm (VirtualBox, VMSVGA, no KMS): the legacy vmware DDX offers
 // one output named "default" with no rotations and no properties.
-test('VMSVGA capture: one legacy output, no rotation, no properties', () => {
+captured('VMSVGA capture: one legacy output, no rotation, no properties', () => {
     const r = X.parseVerbose(fixture('xrandr-verbose.vmsvga.txt'));
     assert.deepEqual(r.screen.current, [1280, 720]);
     assert.equal(r.warnings[0], 'Failed to get size of gamma for output default');
@@ -30,7 +29,7 @@ test('VMSVGA capture: one legacy output, no rotation, no properties', () => {
     assert.equal(o.preferredMode, null, 'a non-KMS output marks no preferred mode');
 });
 
-test('VMSVGA capture: timings are read per mode', () => {
+captured('VMSVGA capture: timings are read per mode', () => {
     const r = X.parseVerbose(fixture('xrandr-verbose.vmsvga.txt'));
     const m = r.outputs[0].modes[1];
     assert.equal(m.id, '0x520');
@@ -39,9 +38,33 @@ test('VMSVGA capture: timings are read per mode', () => {
     assert.equal(m.v.clockHz, 50);
 });
 
+// The header words for a reflected output are xrandr's reflection_name(): "X axis",
+// "Y axis", "X and Y axis", printed after the rotation word and before the capability
+// list (confirmed in the 1.5.3 binary's strings; the live form is to be seen on a KMS bench).
+test('header: a reflected output parses its rotation and reflection; an unreflected one reads normal', () => {
+    const head = (tail) => 'Screen 0: minimum 8 x 8, current 1280 x 720, maximum 32767 x 32767\nHDMI-1 connected primary 1280x720+0+0 (0x4b) ' + tail + ' (normal left inverted right x axis y axis) 527mm x 296mm\n\tIdentifier: 0x42\n';
+    let o = X.parseVerbose(head('right X axis')).outputs[0];
+    assert.equal(o.rotation, 'right');
+    assert.equal(o.reflection, 'x');
+    assert.deepEqual(o.physical, { widthMm: 527, heightMm: 296 });
+    o = X.parseVerbose(head('normal X and Y axis')).outputs[0];
+    assert.equal(o.reflection, 'xy');
+    o = X.parseVerbose(head('inverted Y axis')).outputs[0];
+    assert.equal(o.reflection, 'y');
+    o = X.parseVerbose(head('left')).outputs[0];
+    assert.equal(o.rotation, 'left');
+    assert.equal(o.reflection, 'normal');
+    assert.deepEqual(o.rotationsSupported, ['normal', 'left', 'inverted', 'right']);
+    assert.deepEqual(o.reflectionsSupported, ['x', 'y']);
+    const off = X.parseVerbose('Screen 0: minimum 8 x 8, current 1280 x 720, maximum 32767 x 32767\nDP-1 disconnected (normal left inverted right x axis y axis)\n').outputs[0];
+    assert.equal(off.rotation, null);
+    assert.equal(off.reflection, null);
+    assert.deepEqual(off.rotationsSupported, ['normal', 'left', 'inverted', 'right']);
+});
+
 // Synthetic, in modesetting's exact print format, for a quirked eDP panel on i915.
 // To be replaced by the GOLE 2 Pro capture.
-test('KMS fixture: panel orientation and driver properties are read', () => {
+captured('KMS fixture: panel orientation and driver properties are read', () => {
     const r = X.parseVerbose(fixture('xrandr-verbose.i915-quirked.synthetic.txt'));
     assert.equal(r.outputs.length, 3);
     const [edp, hdmi, dp] = r.outputs;
@@ -67,7 +90,7 @@ test('KMS fixture: panel orientation and driver properties are read', () => {
     assert.equal(X.connectedOutputs(r).length, 1);
 });
 
-test('EDID hex continuation lines do not become properties', () => {
+captured('EDID hex continuation lines do not become properties', () => {
     const r = X.parseVerbose(fixture('xrandr-verbose.i915-quirked.synthetic.txt'));
     assert.equal(Object.keys(r.outputs[0].properties).some((k) => /^[0-9a-f]{20,}$/.test(k)), false);
 });
@@ -112,7 +135,7 @@ test('fitArgs moves the picture by the requested pixels', () => {
     assert.throws(() => X.fitArgs('x', 1, 1, { scaleX: 0 }), RangeError);
 });
 
-test('a modeline is rebuilt from the parsed timings, so porches can be edited and re-added', () => {
+captured('a modeline is rebuilt from the parsed timings, so porches can be edited and re-added', () => {
     const r = X.parseVerbose(fixture('xrandr-verbose.i915-quirked.synthetic.txt'));
     const mode = r.outputs[0].currentMode;
     const line = X.modeline(mode, { name: 'panel_fixed' });

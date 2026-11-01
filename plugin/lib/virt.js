@@ -5,7 +5,9 @@
 // and the kernel line (video=). The last two ride rotation.cfg (grub.js); this module
 // renders the Xorg piece and classifies the host.
 
-const XORG_PATH = '/etc/X11/xorg.conf.d/10-resolution.conf';
+// Written by the root helper (xorg-conf write resolution); set-resolution.sh used
+// 10-resolution.conf, the plugin's file carries its name so uninstall can find it.
+const XORG_PATH = '/etc/X11/xorg.conf.d/90-display-configuration-resolution.conf';
 
 // systemd-detect-virt words and the DMI strings that name the same hypervisors.
 function classify({ detectVirt, sysVendor, productName, boardVendor } = {}) {

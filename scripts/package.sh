@@ -1,8 +1,8 @@
 #!/bin/bash
 # Assemble the Volumio plugin zip: the plugin directory's files at the root of
 # the zip as Volumio's plugin manager expects, the licence, and the node modules.
-# Output: dist/display_configuration-<version>.zip. The plugin's tests and the
-# repository's own files (scripts, workflows, docs) stay out.
+# Output: dist/display_configuration-<version>.zip. The repository's own files
+# (tests, scripts, workflows, docs) are outside plugin/ and stay out.
 set -euo pipefail
 ROOT=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd)
 PLUGIN=$ROOT/plugin
@@ -14,7 +14,6 @@ rm -rf "$ROOT/dist/stage"
 mkdir -p "$STAGE" "$ROOT/dist"
 
 cp -r "$PLUGIN/." "$STAGE/"
-rm -rf "$STAGE/test"
 cp "$ROOT/LICENSE" "$STAGE/LICENSE"
 chmod 755 "$STAGE/install.sh" "$STAGE/uninstall.sh"
 
@@ -32,7 +31,7 @@ else
     sh -c "npm install --omit=dev --no-audit --no-fund --loglevel=error >/dev/null && chown -R $(id -u):$(id -g) /plugin"
 fi
 rm -f "$STAGE/package-lock.json"
-for module in fs-extra kew v-conf socket.io-client; do
+for module in fs-extra kew v-conf; do
   [ -f "$STAGE/node_modules/$module/package.json" ] || { echo "package: module $module missing after npm install" >&2; exit 1; }
 done
 

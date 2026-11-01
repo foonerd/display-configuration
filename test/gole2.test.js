@@ -1,20 +1,19 @@
 'use strict';
-// The GOLE 2 Pro, captured 2026-11-01 while running the shipped plugin 0.0.40 with
-// settings Andrew verified on the glass: "Orientation works: Plymouth, screen and
-// touch." Whatever the new model derives from those settings must equal what the
-// device is doing, byte for byte. Captures: xrandr --verbose, xinput list and
-// list-props, the live config.json and rotation.cfg.
+// A GOLE 2 Pro captured 2026-11-01 while running the shipped plugin 0.0.40 with
+// settings verified on the device: splash, screen and touch all upright. Whatever
+// the new model derives from those settings must equal what the device is doing,
+// byte for byte. Captures: xrandr --verbose, xinput list and list-props, the live
+// config.json and rotation.cfg.
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('fs');
-const path = require('path');
-const O = require('../lib/orientation');
-const X = require('../lib/xrandr');
-const I = require('../lib/xinput');
-const G = require('../lib/grub');
-const P = require('../lib/profile');
+const O = require('../plugin/lib/orientation');
+const X = require('../plugin/lib/xrandr');
+const I = require('../plugin/lib/xinput');
+const G = require('../plugin/lib/grub');
+const P = require('../plugin/lib/profile');
+const { fixture, skip } = require('./fixtures');
 
-const fixture = (f) => fs.readFileSync(path.join(__dirname, 'fixtures', f), 'utf8');
+const captured = (name, fn) => test(name, { skip }, fn);
 
 // What the device is doing (the oracle).
 const LIVE = {
@@ -23,7 +22,7 @@ const LIVE = {
     rotationCfg: 'set screen=plymouth=90\nset efifb=video=efifb\nset fbcon=fbcon=rotate:1\n',
 };
 
-test('GOLE 2 Pro: the capture is what the research expected of an unquirked portrait panel', () => {
+captured('GOLE 2 Pro: the capture is what the research expected of an unquirked portrait panel', () => {
     const r = X.parseVerbose(fixture('xrandr-verbose.gole2-dsi.txt'));
     const dsi = r.outputs.find((o) => o.name === 'DSI-1');
     assert.equal(dsi.connected, true);
@@ -40,7 +39,7 @@ test('GOLE 2 Pro: the capture is what the research expected of an unquirked port
     assert.deepEqual(r.outputs.map((o) => o.name), ['DSI-1', 'HDMI-1', 'DP-1']);
 });
 
-test('GOLE 2 Pro: the Goodix is an absolute pointer and its live matrix is the "left" element', () => {
+captured('GOLE 2 Pro: the Goodix is an absolute pointer and its live matrix is the "left" element', () => {
     const list = I.parseList(fixture('xinput-list.gole2.txt'));
     const touch = list.find((d) => d.id === 10);
     assert.equal(touch.name, 'Goodix Capacitive TouchScreen');
@@ -53,7 +52,7 @@ test('GOLE 2 Pro: the Goodix is an absolute pointer and its live matrix is the "
     assert.ok(O.equals(O.compose(O.make('right'), O.make('inverted')), O.make('left')));
 });
 
-test('GOLE 2 Pro: the live 0.0.40 settings migrate and plan to exactly what the device runs', () => {
+captured('GOLE 2 Pro: the live 0.0.40 settings migrate and plan to exactly what the device runs', () => {
     const old = JSON.parse(fixture('config.gole2.0.0.40.json'));
     assert.ok(P.isLegacy(old));
     const cfg = P.migrateFrom043(old);
@@ -85,7 +84,7 @@ test('GOLE 2 Pro: the live 0.0.40 settings migrate and plan to exactly what the 
 // The same device, described the way the new UI will: the panel is mounted right
 // side up (a fact about the hardware, entered once), the user wants it upright.
 // The derived actions must be the same as above.
-test('GOLE 2 Pro: declaring the panel mount instead of a screen turn yields the same actions', () => {
+captured('GOLE 2 Pro: declaring the panel mount instead of a screen turn yields the same actions', () => {
     const cfg = P.defaults();
     cfg.profiles.default.outputs['*'].panelOrientation = 'Right Side Up';
     cfg.profiles.default.outputs['*'].orientation = 'normal';
