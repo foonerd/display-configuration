@@ -40,6 +40,7 @@ case "${1:-}" in
     esac
     case "$sub" in
       write)
+        mkdir -p "$XORG_DIR"
         tmp=$(mktemp "$XORG_DIR/.dc.XXXXXX")
         head -c 16384 > "$tmp"
         # Only the lines an InputClass or Monitor/Screen section is made of.
