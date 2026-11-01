@@ -244,6 +244,13 @@ function createRunners({ run = defaultRun, display = ':0', log = () => { }, read
         }
     }
 
+    // pkill -x compares the 15-character comm, which "unclutter-xfixes" exceeds;
+    // the full command line is matched instead.
+    async function stopCursorHiders() {
+        await run('pkill', ['-f', '^unclutter-xfixes( |$)'], { timeout: 3000 });
+        await run('pkill', ['-f', '^unclutter( |$)'], { timeout: 3000 });
+    }
+
     // DPMS and the X screen saver are set together; "not while playing" is honoured by
     // the caller passing state.playing, which turns blanking off until playback stops.
     async function applyScreensaver(ss, probeResult, report, state = {}) {
@@ -269,14 +276,12 @@ function createRunners({ run = defaultRun, display = ':0', log = () => { }, read
             }
         }
         if (ss.hideCursor) {
-            await run('pkill', ['-x', 'unclutter-xfixes'], { timeout: 3000 });
-            await run('pkill', ['-x', 'unclutter'], { timeout: 3000 });
+            await stopCursorHiders();
             if (probeResult.tools['unclutter-xfixes']) run('unclutter-xfixes', ['--timeout', '3', '--start-hidden'], { env: xenv, detached: true, timeout: 1000 });
             else if (probeResult.tools.unclutter) run('unclutter', ['-idle', '3', '-root'], { env: xenv, detached: true, timeout: 1000 });
             else report.warnings.push('no unclutter on this player; the cursor stays visible');
         } else {
-            await run('pkill', ['-x', 'unclutter-xfixes'], { timeout: 3000 });
-            await run('pkill', ['-x', 'unclutter'], { timeout: 3000 });
+            await stopCursorHiders();
         }
     }
 

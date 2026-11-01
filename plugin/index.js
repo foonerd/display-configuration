@@ -162,7 +162,12 @@ DisplayConfiguration.prototype.watchX = function () {
       self.debug('X server ' + (was === null ? 'up' : 'restarted') + ' (pid ' + pid + ')');
       setTimeout(() => { if (self.active && self.xPid === pid) self.applyAll('x up').catch(() => undefined); }, X_SETTLE_MS).unref();
    };
-   this.timers.push(setInterval(tick, X_POLL_MS).unref());
+   // The server already up at start is handled by the start apply; the watcher takes
+   // it from there.
+   self.runners.xServerPid().then((pid) => {
+      self.xPid = pid;
+      if (self.active) self.timers.push(setInterval(tick, X_POLL_MS).unref());
+   });
 };
 
 // A laptop lid: closed turns the panel off, opened turns it on. Nothing where no lid.

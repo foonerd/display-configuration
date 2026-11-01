@@ -192,7 +192,7 @@ test('screensaver: playing with notWhilePlaying turns blanking off; stopped turn
     m.calls.length = 0;
     await r.applyScreensaver({ type: 'dpms', timeout: 120, notWhilePlaying: true, hideCursor: false }, probe, report, { playing: false });
     assert.deepEqual(argvOf(m.calls, 'xset').pop(), ['s', 'off', '+dpms', 'dpms', '0', '0', '120']);
-    assert.ok(m.calls.some((c) => c.cmd === 'pkill' && c.args[1] === 'unclutter-xfixes'));
+    assert.ok(m.calls.some((c) => c.cmd === 'pkill' && c.args[0] === '-f' && /unclutter-xfixes/.test(c.args[1])), 'the full command line is matched: the comm is cut at 15 characters');
     m.calls.length = 0;
     await r.applyScreensaver({ type: 'off', timeout: 120, notWhilePlaying: false, hideCursor: false }, probe, report, { playing: false });
     assert.deepEqual(argvOf(m.calls, 'xset').pop(), ['s', 'off', '-dpms']);

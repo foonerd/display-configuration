@@ -59,7 +59,7 @@ function turnOptions(t, withFollow) {
 function modeOptions(t, out) {
     const seen = new Set();
     const opts = [];
-    const pref = out.preferredMode;
+    const pref = out.preferredMode || out.currentMode;
     opts.push(option(t, 'preferred', 'MODE_PREFERRED', { mode: pref ? pref.width + 'x' + pref.height : '-' }));
     for (const m of out.modes || []) {
         const name = m.width + 'x' + m.height;
