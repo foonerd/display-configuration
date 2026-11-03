@@ -14,7 +14,7 @@ The settings page is built from what the player has: one section per connected s
 
 **Touch and pointer.** Touchscreens follow the turn of their screen. Each device can carry an offset for a controller mounted differently from the panel, and in a multi-screen layout can be glued to one screen. The matrices are written to an Xorg `InputClass` as well, so they hold from the first frame after a display restart.
 
-**Boot console and splash.** The turn of the kernel console and of the boot logo, the same as the screen or set apart. Written to the file the image's GRUB configuration reads; the console turns at once, the boot logo at the next start.
+**Boot console and splash.** The turn of the kernel console and of the boot logo, the same as the screen or set apart. The console turns at once, the boot logo at the next start. The x86 image boots two ways and the plugin serves both: on UEFI firmware the image's GRUB configuration reads the plugin's `rotation.cfg`; on legacy BIOS firmware the image boots through syslinux, and the plugin writes the same settings onto the kernel line in `/boot/syslinux.cfg` and writes them again after every Volumio update (an update puts the stock file back). The Boot section of the settings page names the boot path in use and whether the current boot already carries the settings.
 
 **Screensaver and brightness.** The screen off (DPMS) or xscreensaver after a timeout, held off while music plays if wanted. The cursor hidden when idle. Brightness through the backlight where the device has one, in software otherwise. A button turns the screen off now. A laptop's lid turns the screen off and on.
 
@@ -51,14 +51,15 @@ After updating, restart Volumio (or reboot) so the new version is the one runnin
 | Plugin | `/data/plugins/user_interface/display_configuration/` |
 | Settings | `/data/configuration/user_interface/display_configuration/config.json` (one key, `state`, holding the profiles as JSON) |
 | Backups | `/data/INTERNAL/display_configuration/backups/<name>.json` |
-| Boot-time rotation | `/data/plugins/user_interface/display_configuration/rotation.cfg`, read by the image's GRUB configuration at boot to set the console and boot logo orientation |
+| Boot-time rotation, UEFI | `/data/plugins/user_interface/display_configuration/rotation.cfg`, read by the image's GRUB configuration at boot to set the console and boot logo orientation |
+| Boot-time rotation, legacy BIOS | the `APPEND` line of `/boot/syslinux.cfg` carries `plymouth=`, `video=` and `fbcon=rotate:`; the stock line is kept as `/boot/syslinux.cfg.display-configuration.bak` |
 | Touch persistence | `/etc/X11/xorg.conf.d/95-display-configuration-touch.conf` |
 | Fixed resolution | `/etc/X11/xorg.conf.d/90-display-configuration-resolution.conf` |
 | Root helper | `/usr/local/bin/display-configuration-root`, allowed to the `volumio` user by `/etc/sudoers.d/volumio-user-display_configuration`; the only thing the plugin runs as root |
 | Display session | `volumio-kiosk.service`; log: `journalctl -u volumio-kiosk` and `/var/log/volumiokiosk.log` |
 | Diagnostic report | `/tmp/volumio-display-diagnostics.txt` |
 
-Uninstalling removes the helper, the sudoers entry, the Xorg snippets and the boot file; backups are kept.
+Uninstalling removes the helper, the sudoers entry, the Xorg snippets and the boot file, and takes the plugin's settings off the syslinux kernel line; backups are kept.
 
 ## Repository
 

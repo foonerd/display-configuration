@@ -4,6 +4,24 @@ All notable changes to Display Configuration are recorded here. The format follo
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-03
+
+The boot layer on legacy BIOS players. Found by the first community test (a Dell Latitude 3189 booting the Volumio stick in BIOS mode): on that boot path the image uses syslinux rather than GRUB, and the plugin's `rotation.cfg` was never read, so the console and the boot logo stayed unturned while everything else worked.
+
+### Added
+
+- Legacy BIOS boots: the plugin detects the boot path and writes `plymouth=`, `video=` and `fbcon=rotate:` onto the kernel line in `/boot/syslinux.cfg`, through the root helper's new `syslinux set|clear` verb. Only those tokens are ever changed; the file is checked before and after, the stock line is kept as `syslinux.cfg.display-configuration.bak`, and the line is written again whenever a Volumio update has put the stock file back. The default turn leaves the stock file untouched.
+- The Boot section names the boot path (UEFI/GRUB, legacy BIOS/syslinux) and whether the boot that is running already carries the settings; "restart needed" follows from the running kernel's command line, on both paths.
+- The diagnostics report carries the boot path and `/boot/syslinux.cfg`.
+
+### Fixed
+
+- At a cold start, before the display server is up, the boot file was planned as "normal" and rewritten with the configured turn only once the display came up; the console could turn to normal and back in between. The boot layer is now planned from the profile alone, so it is written once and holds even when the display never starts.
+
+### Changed
+
+- Uninstalling takes the plugin's tokens off the syslinux kernel line before the helper goes.
+
 ## [1.0.0] - 2026-11-01
 
 A rework from the ground up. Settings made under 0.0.43 are carried over on the first start.

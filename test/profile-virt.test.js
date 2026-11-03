@@ -116,6 +116,21 @@ captured('plan, VMSVGA guest: legacy output cannot rotate, boot keeps video=efif
 // The GPD-class case: the kernel knows the panel is Right Side Up. Manual mode with
 // orientation "normal" means "upright": X gets right, the kernel line gets nothing
 // extra, the touch gets right.
+test('plan without X (every cold start, before the kiosk): the boot step is the profile\'s turn, not normal, and equals the step planned with X', () => {
+    const cfg = P.defaults();
+    cfg.profiles.default.outputs['*'].orientation = 'inverted';
+    const noX = P.plan(cfg, { outputs: [], inputs: [] }).steps.find((s) => s.action === 'rotation.cfg');
+    assert.equal(noX.plymouth, 180);
+    assert.equal(noX.fbcon, 2);
+    const withX = P.plan(cfg, { outputs: [{ name: 'eDP-1', connected: true, panelOrientation: null, rotationsSupported: ['normal', 'left', 'inverted', 'right'], properties: {}, currentMode: { width: 1366, height: 768 } }], inputs: [] }).steps.find((s) => s.action === 'rotation.cfg');
+    assert.deepEqual(noX, withX, 'one boot file, written once per boot');
+    cfg.profiles.default.mode = 'follow';
+    assert.equal(P.plan(cfg, { outputs: [], inputs: [] }).steps.find((s) => s.action === 'rotation.cfg').fbcon, 0, 'follow mode leaves the kernel line alone');
+    cfg.profiles.default.mode = 'manual';
+    cfg.profiles.default.boot.console = 'right';
+    assert.equal(P.plan(cfg, { outputs: [], inputs: [] }).steps.find((s) => s.action === 'rotation.cfg').fbcon, 1, 'a console set apart is honoured without X too');
+});
+
 captured('plan, quirked eDP, manual upright: X right, kernel remainder none, touch right', () => {
     const cfg = P.defaults();
     const plan = P.plan(cfg, probeFrom('xrandr-verbose.i915-quirked.synthetic.txt', [{ id: 9, name: 'Goodix Capacitive TouchScreen', kind: 'absolute' }]));

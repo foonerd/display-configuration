@@ -1,6 +1,6 @@
 {
   "name": "display_configuration",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Rotation, geometry, touch, boot console and splash, screensaver and brightness for the screen of a Volumio x86 player",
   "main": "index.js",
   "author": "Balbuze, Just a Nerd",

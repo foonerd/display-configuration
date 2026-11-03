@@ -64,7 +64,8 @@ function fakeMachine({ xrandrVerbose = '', xinputList = '', xinputProps = {}, fi
         if (cmd === 'pidof') return xrandrVerbose ? ok('1234\n') : { code: 1, stdout: '', stderr: '', error: '' };
         return ok('');
     }
-    return { run, calls, fsys, readFile: (f) => (f in fsys ? fsys[f] : null), writeFile: (f, text) => { fsys[f] = text; }, listDir: () => [] };
+    // A UEFI player, as the two benches are: GRUB reads rotation.cfg.
+    return { run, calls, fsys, readFile: (f) => (f in fsys ? fsys[f] : null), writeFile: (f, text) => { fsys[f] = text; }, listDir: (d) => (d === '/sys/firmware/efi' ? ['efivars'] : []) };
 }
 
 function wire(v, m) {
@@ -93,7 +94,7 @@ test('first start on a fresh install writes the defaults into the one "state" ke
 captured('first start over a 0.0.40 config.json migrates it once, drops the old keys, and plans what the device runs', async () => {
     const old = JSON.parse(fixture('config.gole2.0.0.40.json'));
     const v = fakeVolumio(old);
-    const m = fakeMachine({ xrandrVerbose: fixture('xrandr-verbose.gole2-dsi.txt'), xinputList: fixture('xinput-list.gole2.txt'), xinputProps: { 10: fixture('xinput-props.gole2-goodix.txt') }, files: { '/data/plugins/user_interface/display_configuration/rotation.cfg': 'set screen=plymouth=90\nset efifb=video=efifb\nset fbcon=fbcon=rotate:1\n' } });
+    const m = fakeMachine({ xrandrVerbose: fixture('xrandr-verbose.gole2-dsi.txt'), xinputList: fixture('xinput-list.gole2.txt'), xinputProps: { 10: fixture('xinput-props.gole2-goodix.txt') }, files: { '/data/plugins/user_interface/display_configuration/rotation.cfg': 'set screen=plymouth=90\nset efifb=video=efifb\nset fbcon=fbcon=rotate:1\n', '/proc/cmdline': 'BOOT_IMAGE=/vmlinuz quiet hwdevice=x86 use_kmsg=no plymouth=90 video=efifb fbcon=rotate:1\n' } });
     const plugin = wire(v, m);
     plugin.onVolumioStart();
     plugin.onStart();
@@ -104,7 +105,8 @@ captured('first start over a 0.0.40 config.json migrates it once, drops the old 
     assert.deepEqual(Object.keys(saved), ['state'], 'the flat keys are gone');
     assert.ok(v.logs.some(([, msg]) => /migrated from the 0.0.x/.test(msg)));
     assert.deepEqual(plugin.lastReport.errors, []);
-    assert.equal(plugin.lastReport.rebootNeeded, false, 'the boot file already matches');
+    assert.equal(plugin.lastReport.rebootNeeded, false, 'the boot file already matches and the running kernel carries the turn');
+    assert.deepEqual(plugin.lastReport.boot, { loader: 'grub', inEffect: true });
     assert.ok(m.calls.some((c) => c.cmd === 'xrandr' && c.args.join(' ') === '--output DSI-1 --auto --rotate right --reflect normal --transform none'));
     plugin.onStop();
 });

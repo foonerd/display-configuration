@@ -32,6 +32,21 @@ test('every key the builder asks for exists in English', () => {
     for (const k of asked) assert.ok(k in en, 'missing ' + k);
 });
 
+test('the boot section names the boot path and whether the running boot carries the turn', () => {
+    const cfg = P.defaults();
+    cfg.profiles.default.outputs['*'].orientation = 'inverted';
+    const probe = (bootloader, cmdline) => ({ xAvailable: false, outputs: [], inputs: [], tools: {}, bootloader, cmdline });
+    const desc = (p) => UI.build(template(), { cfg, probe: p, backups: [], t, endpoint: ENDPOINT, tools: {} }).sections.find((s) => s.id === 'boot').description;
+    const dell = 'BOOT_IMAGE=vmlinuz quiet hwdevice=x86 use_kmsg=no initrd=volumio.initrd';
+    assert.match(desc(probe('syslinux', dell)), /legacy BIOS \(syslinux\)/);
+    assert.match(desc(probe('syslinux', dell)), /does not carry these settings yet/);
+    assert.match(desc(probe('syslinux', dell + ' plymouth=180 video=efifb fbcon=rotate:2')), /carries these settings/);
+    assert.match(desc(probe('grub', 'BOOT_IMAGE=/vmlinuz quiet plymouth=180 video=efifb fbcon=rotate:2')), /UEFI \(GRUB\).*carries these settings/);
+    assert.match(desc(probe('none', 'console=tty1')), /cannot be turned here/);
+    assert.doesNotMatch(desc(probe('none', 'console=tty1')), /restart/);
+    assert.equal(desc(probe(undefined, '')), 'TRANSLATE.DISPLAY_CONFIGURATION.BOOT_DESC', 'a probe without the field changes nothing');
+});
+
 test('build without X: one placeholder screen section, inputs section without a save button, status says so', () => {
     const ui = UI.build(template(), { cfg: P.defaults(), probe: { xAvailable: false, outputs: [], inputs: [], tools: {} }, backups: [], t, endpoint: ENDPOINT, tools: {} });
     const ids = ui.sections.map((s) => s.id);
